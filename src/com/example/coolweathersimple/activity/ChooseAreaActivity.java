@@ -126,7 +126,7 @@ public class ChooseAreaActivity extends Activity {
 					
 //					当选择到了县的时候,从List里面取出countyCode传递到WeatherActivity中
 				} else if (currentLevel == LEVEL_COUNTY) {
-					String countyCode = countyList.get(index).getCountyCode();
+					String countyCode = countyList.get(index).getCountyCode();					
 					Intent intent = new Intent(ChooseAreaActivity.this, WeatherActivity.class);
 					intent.putExtra("county_code", countyCode);
 					ChooseAreaActivity.this.startActivity(intent);

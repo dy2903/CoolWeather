@@ -1,10 +1,4 @@
-package com.coolweather.app.activity;
-
-import com.coolweather.app.R;
-import com.coolweather.app.service.AutoUpdateService;
-import com.coolweather.app.util.HttpCallbackListener;
-import com.coolweather.app.util.HttpUtil;
-import com.coolweather.app.util.Utility;
+package com.example.coolweathersimple.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,12 +7,20 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.coolweathersimple.R;
+import com.example.coolweathersimple.util.HttpCallbackListener;
+import com.example.coolweathersimple.util.HttpUtil;
+import com.example.coolweathersimple.util.Utility;
+/*
+ * 显示天气:UI
+ * 通过ChooseAreaActivity得到的城市数据再进行天气的查询.
+ */
 public class WeatherActivity extends Activity implements OnClickListener{
 
 	private LinearLayout weatherInfoLayout;
@@ -70,20 +72,25 @@ public class WeatherActivity extends Activity implements OnClickListener{
 		currentDateText = (TextView) findViewById(R.id.current_date);
 		switchCity = (Button) findViewById(R.id.switch_city);
 		refreshWeather = (Button) findViewById(R.id.refresh_weather);
+		
+		/*
+		 * 从ChooseAreaActivity从获得信息
+		 */
 		String countyCode = getIntent().getStringExtra("county_code");
 		if (!TextUtils.isEmpty(countyCode)) {
 			// 有县级代号时就去查询天气
 			publishText.setText("同步中...");
 			weatherInfoLayout.setVisibility(View.INVISIBLE);
 			cityNameText.setVisibility(View.INVISIBLE);
-			queryWeatherCode(countyCode);
+//			查询WeatherCode
+			this.queryWeatherCode(countyCode);
 		} else {
 			// 没有县级代号时就直接显示本地天气
-			showWeather();
+			this.showWeather();
 		}
 		switchCity.setOnClickListener(this);
 		refreshWeather.setOnClickListener(this);
-	}
+	};
 	
 	@Override
 	public void onClick(View v) {
@@ -91,7 +98,7 @@ public class WeatherActivity extends Activity implements OnClickListener{
 		case R.id.switch_city:
 			Intent intent = new Intent(this, ChooseAreaActivity.class);
 			intent.putExtra("from_weather_activity", true);
-			startActivity(intent);
+			this.startActivity(intent);
 			finish();
 			break;
 		case R.id.refresh_weather:
@@ -99,20 +106,22 @@ public class WeatherActivity extends Activity implements OnClickListener{
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 			String weatherCode = prefs.getString("weather_code", "");
 			if (!TextUtils.isEmpty(weatherCode)) {
-				queryWeatherInfo(weatherCode);
+//				通过天气Code来查询天气信息
+				this.queryWeatherInfo(weatherCode);
+				
 			}
 			break;
 		default:
 			break;
 		}
-	}
+	};
 	
 	/**
 	 * 查询县级代号所对应的天气代号。
 	 */
 	private void queryWeatherCode(String countyCode) {
 		String address = "http://www.weather.com.cn/data/list3/city" + countyCode + ".xml";
-		queryFromServer(address, "countyCode");
+		this.queryFromServer(address, "countyCode");
 	}
 
 	/**
@@ -120,11 +129,13 @@ public class WeatherActivity extends Activity implements OnClickListener{
 	 */
 	private void queryWeatherInfo(String weatherCode) {
 		String address = "http://www.weather.com.cn/data/cityinfo/" + weatherCode + ".html";
-		queryFromServer(address, "weatherCode");
+		this.queryFromServer(address, "weatherCode");
 	}
 	
 	/**
-	 * 根据传入的地址和类型去向服务器查询天气代号或者天气信息。
+	 * 根据传入的地址和类型去向服务器
+	 * 查询天气代号
+	 * 天气信息。
 	 */
 	private void queryFromServer(final String address, final String type) {
 		HttpUtil.sendHttpRequest(address, new HttpCallbackListener() {
@@ -136,7 +147,8 @@ public class WeatherActivity extends Activity implements OnClickListener{
 						String[] array = response.split("\\|");
 						if (array != null && array.length == 2) {
 							String weatherCode = array[1];
-							queryWeatherInfo(weatherCode);
+//							查询出了天气代码,立马转入查询天气信息
+							WeatherActivity.this.queryWeatherInfo(weatherCode);
 						}
 					}
 				} else if ("weatherCode".equals(type)) {
@@ -145,7 +157,7 @@ public class WeatherActivity extends Activity implements OnClickListener{
 					runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							showWeather();
+							WeatherActivity.this.showWeather();
 						}
 					});
 				}
@@ -164,7 +176,8 @@ public class WeatherActivity extends Activity implements OnClickListener{
 	}
 	
 	/**
-	 * 从SharedPreferences文件中读取存储的天气信息，并显示到界面上。
+	 * 从SharedPreferences文件中读取存储的天气信息，
+	 * 并显示到界面上。
 	 */
 	private void showWeather() {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -176,6 +189,7 @@ public class WeatherActivity extends Activity implements OnClickListener{
 		currentDateText.setText(prefs.getString("current_date", ""));
 		weatherInfoLayout.setVisibility(View.VISIBLE);
 		cityNameText.setVisibility(View.VISIBLE);
+//		后台自动更新
 		Intent intent = new Intent(this, AutoUpdateService.class);
 		startService(intent);
 	}
