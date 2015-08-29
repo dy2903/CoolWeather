@@ -1,4 +1,8 @@
 package com.example.coolweathersimple.model;
+/*
+ * City实体类
+ * 属性有:名称,市编号,省编号
+ */
 
 public class City {
 

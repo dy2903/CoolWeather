@@ -41,6 +41,7 @@ public class CoolWeatherDB {
 
 	/**
 	 * 获取CoolWeatherDB的实例。
+	 * 外部调用:CoolWeatherDB.getInstance (this);
 	 */
 	public synchronized static CoolWeatherDB getInstance(Context context) {
 		if (coolWeatherDB == null) {
