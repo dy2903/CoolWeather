@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.coolweathersimple.R;
+import com.example.coolweathersimple.service.AutoUpdateService;
 import com.example.coolweathersimple.util.HttpCallbackListener;
 import com.example.coolweathersimple.util.HttpUtil;
 import com.example.coolweathersimple.util.Utility;
